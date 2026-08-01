@@ -14,8 +14,8 @@ Desktop notifications for AI coding assistants. Get notified in macOS Notificati
 - Click notification to jump to the corresponding Terminal tab
 - Distinguish multiple parallel sessions by directory name
 - Supports Claude Code and Codex
-- Goal-aware Codex notifications: active long-running Goals stay quiet until
-  their real `complete` state
+- Goal-aware Codex notifications: active long-running Goals stay quiet,
+  `blocked` Goals ask for attention, and `complete` Goals notify once
 - Optional native Codex notification gate for the same Goal-aware behavior
 - Fully local by default; an optional HTTP notification bridge can be configured
 

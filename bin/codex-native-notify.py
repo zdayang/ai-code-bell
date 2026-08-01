@@ -13,22 +13,20 @@ from pathlib import Path
 INCOMPLETE_STATUSES = {
     "active",
     "paused",
-    "blocked",
-    "usage_limited",
-    "budget_limited",
 }
+BLOCKED_STATUSES = {"blocked", "usage_limited", "budget_limited"}
 
 
-def goal_for_thread(thread_id: str) -> tuple[str, str] | None:
+def goal_for_thread(thread_id: str) -> tuple[str, str, int] | None:
     db_path = Path(
         os.environ.get("CODEX_GOALS_DB", str(Path.home() / ".codex/goals_1.sqlite"))
     )
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1) as db:
         row = db.execute(
-            "SELECT goal_id, status FROM thread_goals WHERE thread_id = ?",
+            "SELECT goal_id, status, updated_at_ms FROM thread_goals WHERE thread_id = ?",
             (thread_id,),
         ).fetchone()
-    return (str(row[0]), str(row[1])) if row else None
+    return (str(row[0]), str(row[1]), int(row[2])) if row else None
 
 
 def should_forward(payload: dict[str, object]) -> bool:
@@ -45,10 +43,10 @@ def should_forward(payload: dict[str, object]) -> bool:
     if goal is None:
         return True
 
-    goal_id, status = goal
+    goal_id, status, updated_at_ms = goal
     if status in INCOMPLETE_STATUSES:
         return False
-    if status != "complete":
+    if status not in BLOCKED_STATUSES and status != "complete":
         return True
 
     marker_dir = Path(
@@ -58,7 +56,8 @@ def should_forward(payload: dict[str, object]) -> bool:
         )
     )
     marker_dir.mkdir(parents=True, exist_ok=True)
-    marker = marker_dir / goal_id
+    marker_name = goal_id if status == "complete" else f"{goal_id}-{status}-{updated_at_ms}"
+    marker = marker_dir / marker_name
     try:
         marker.touch(exist_ok=False)
     except FileExistsError:

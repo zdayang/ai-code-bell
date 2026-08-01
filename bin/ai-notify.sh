@@ -33,21 +33,33 @@ try:
         raise ValueError("missing session id")
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=1) as db:
         row = db.execute(
-            "SELECT goal_id, status FROM thread_goals WHERE thread_id = ?",
+            "SELECT goal_id, status, updated_at_ms FROM thread_goals WHERE thread_id = ?",
             (session_id,),
         ).fetchone()
     if row:
-        print(f"{row[1]}\t{row[0]}")
+        print(f"{row[1]}\t{row[0]}\t{row[2]}")
 except Exception:
     pass
 PY
 )"
 
   GOAL_STATUS="${GOAL_INFO%%$'\t'*}"
-  GOAL_ID="${GOAL_INFO#*$'\t'}"
+  GOAL_REST="${GOAL_INFO#*$'\t'}"
+  GOAL_ID="${GOAL_REST%%$'\t'*}"
+  GOAL_UPDATED_AT="${GOAL_REST#*$'\t'}"
   case "$GOAL_STATUS" in
-    active|paused|blocked|usage_limited|budget_limited)
+    active|paused)
       exit 0
+      ;;
+    blocked|usage_limited|budget_limited)
+      MARKER_DIR="$HOME/.local/state/ai-notify/blocked-goals"
+      MARKER="$MARKER_DIR/$GOAL_ID-$GOAL_STATUS-$GOAL_UPDATED_AT"
+      if [ -e "$MARKER" ]; then
+        exit 0
+      fi
+      mkdir -p "$MARKER_DIR"
+      : > "$MARKER"
+      STATE="blocked"
       ;;
     complete)
       MARKER_DIR="$HOME/.local/state/ai-notify/completed-goals"
@@ -70,6 +82,7 @@ fi
 case "$STATE" in
   ask)  MSG="需要你的操作" ;;
   done) MSG="任务完成" ;;
+  blocked) MSG="任务受阻" ;;
   *)    MSG="$STATE" ;;
 esac
 

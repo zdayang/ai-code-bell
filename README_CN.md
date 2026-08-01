@@ -14,7 +14,8 @@ AI 编码助手的桌面通知。当 Claude Code 或 Codex 完成任务、需要
 - 点击通知自动跳转到对应的 Terminal tab
 - 通过目录名区分多个并行会话
 - 支持 Claude Code 和 Codex
-- 能识别 Codex 长期 Goal：运行中的阶段性 `Stop` 不再误报完成
+- 能识别 Codex 长期 Goal：运行中保持安静，`blocked` 时提醒介入，
+  `complete` 时只通知一次
 - 可为 Codex 自带的通知增加相同的 Goal 完成门控
 - 默认纯本地运行，也可选择配置 HTTP 通知桥
 

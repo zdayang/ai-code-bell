@@ -56,7 +56,7 @@ if [ -f "$CODEX_CONFIG" ]; then
     cat >> "$CODEX_CONFIG" << EOF
 
 [features]
-codex_hooks = true
+hooks = true
 
 [[hooks.PermissionRequest]]
 matcher = ".*"

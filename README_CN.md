@@ -4,7 +4,7 @@ AI 编码助手的桌面通知。当 Claude Code 或 Codex 完成任务、需要
 
 ![AICodeBell 通知效果](./ai-code-bell.jpg)
 
-> 灵感来源：[stick-s3-ai-alert](https://github.com/zdayang/stick-s3-ai-alert)（BLE 硬件方案）。AICodeBell 是其纯软件替代——零硬件、零网络，只需 macOS + [alerter](https://github.com/vjeantet/alerter)。
+> 灵感来源：[stick-s3-ai-alert](https://github.com/zdayang/stick-s3-ai-alert)（BLE 硬件方案）。AICodeBell 是其纯软件替代，只需 macOS + [alerter](https://github.com/vjeantet/alerter)。
 
 [English](./README.md)
 
@@ -14,7 +14,8 @@ AI 编码助手的桌面通知。当 Claude Code 或 Codex 完成任务、需要
 - 点击通知自动跳转到对应的 Terminal tab
 - 通过目录名区分多个并行会话
 - 支持 Claude Code 和 Codex
-- 纯本地运行，零网络请求
+- 能识别 Codex 长期 Goal：运行中的阶段性 `Stop` 不再误报完成
+- 默认纯本地运行，也可选择配置 HTTP 通知桥
 
 ## 通知效果
 
@@ -42,6 +43,16 @@ chmod +x install.sh configure.sh
 ```
 
 然后重启 Claude Code 和 Codex。
+
+### 可选 HTTP 通知桥
+
+设置环境变量 `AI_NOTIFY_URL`，或者将地址写在这个文件的第一行：
+
+```text
+~/.config/ai-code-bell/notify-url
+```
+
+脚本会发送只包含 `tool`、`type` 和当前项目目录的 JSON。两者都没有配置时，不会发起网络请求。
 
 ## 详细手动安装
 
@@ -97,7 +108,7 @@ chmod +x ~/.local/bin/ai-notify.sh
 
 ```toml
 [features]
-codex_hooks = true
+hooks = true
 
 [[hooks.PermissionRequest]]
 matcher = ".*"
@@ -127,6 +138,8 @@ Claude Code / Codex
 ai-notify.sh
     ├─ 记录当前 tty（通过 $PPID 获取）
     ├─ 读取 $PWD 获取项目目录名
+    ├─ Codex Goal 尚未完成时抑制阶段性 Stop 通知
+    ├─ 可选发送到 HTTP 通知桥
     ↓
 alerter --title "工具 | 目录 | 状态" --timeout 10
     ↓

@@ -14,7 +14,9 @@ Desktop notifications for AI coding assistants. Get notified in macOS Notificati
 - Click notification to jump to the corresponding Terminal tab
 - Distinguish multiple parallel sessions by directory name
 - Supports Claude Code and Codex
-- Fully local, zero network requests
+- Goal-aware Codex notifications: active long-running Goals stay quiet until
+  their real `complete` state
+- Fully local by default; an optional HTTP notification bridge can be configured
 
 ## Install with AI (Recommended)
 
@@ -34,6 +36,17 @@ chmod +x install.sh configure.sh
 
 Then restart Claude Code and Codex.
 
+### Optional HTTP notification bridge
+
+Set `AI_NOTIFY_URL`, or put the endpoint on the first line of:
+
+```text
+~/.config/ai-code-bell/notify-url
+```
+
+The script sends a small JSON payload containing `tool`, `type`, and the current
+project directory. Without either setting, no network request is made.
+
 ## How It Works
 
 ```
@@ -42,6 +55,8 @@ Claude Code / Codex
 ai-notify.sh
     ├─ captures current tty (via $PPID)
     ├─ reads $PWD for project directory name
+    ├─ suppresses Stop notifications while a Codex Goal is still active
+    ├─ optionally posts to an HTTP notification bridge
     ↓
 alerter --title "Tool | Dir | Status" --timeout 10
     ↓

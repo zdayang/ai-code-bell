@@ -16,6 +16,7 @@ Desktop notifications for AI coding assistants. Get notified in macOS Notificati
 - Supports Claude Code and Codex
 - Goal-aware Codex notifications: active long-running Goals stay quiet until
   their real `complete` state
+- Optional native Codex notification gate for the same Goal-aware behavior
 - Fully local by default; an optional HTTP notification bridge can be configured
 
 ## Install with AI (Recommended)
@@ -64,6 +65,10 @@ macOS Notification Center (stays 10s)
     ↓ user clicks
 AppleScript activates the matching Terminal tab
 ```
+
+For Codex's own `notify` command, put `codex-native-notify.py` before the native
+notification client. The wrapper forwards ordinary task notifications, suppresses
+incomplete Goal turns, and forwards the first notification after Goal completion.
 
 ## Requirements
 

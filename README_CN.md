@@ -15,6 +15,7 @@ AI 编码助手的桌面通知。当 Claude Code 或 Codex 完成任务、需要
 - 通过目录名区分多个并行会话
 - 支持 Claude Code 和 Codex
 - 能识别 Codex 长期 Goal：运行中的阶段性 `Stop` 不再误报完成
+- 可为 Codex 自带的通知增加相同的 Goal 完成门控
 - 默认纯本地运行，也可选择配置 HTTP 通知桥
 
 ## 通知效果
@@ -147,6 +148,10 @@ macOS 右上角通知（停留 10 秒）
     ↓ 用户点击
 AppleScript 激活对应 Terminal tab
 ```
+
+Codex 自带的 `notify` 命令也可以在原生通知程序之前加入
+`codex-native-notify.py`。普通任务仍会通知，长期 Goal 未完成时保持安静，
+真正完成后只放行第一次通知。
 
 ## 要求
 
